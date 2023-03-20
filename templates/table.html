@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 align="center"> Works Log</h1>
+    {% for job in jobs %}
+        <h1> Action #{{ job.id }} </h1>
+        {% for user in users %}
+            {% if user.id == job.team_leader%}
+                <h1> {{ job.job }} {{ user.surname }} {{ user.name }} {{ job.work_sie }} {{job.collaborators }} {{ job.is_finished }} </h1>
+            {% endif %}
+        {% endfor %}
+        <h1> Next </h1>
+    {% endfor %}
+{% endblock %}

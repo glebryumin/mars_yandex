@@ -1,37 +1,25 @@
-from random import randrange
-import sys
+from flask import render_template, Flask
+from data.db_session import *
+from data.users import *
+from data.jobs import *
 
-from PyQt5.QtCore import QPoint
-from PyQt5.QtGui import QPainter, QColor
-from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QWidget
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 
-class MyWidget(QWidget):
-    def __init__(self):
-        super().__init__()
-        uic.loadUi('main.ui', self)
-        self.button.clicked.connect(self.draw)
-        self.paint = False
+@app.route('/')
+def index():
+    params = {}
+    global_init("db/mars_explorer.db")
+    with create_session() as db_sess:
+        users = db_sess.query(User).all()
+        jobs = db_sess.query(Jobs).all()
+    params['users'] = users
+    params['jobs'] = jobs
+    return render_template('table.html', **params)
 
-    def paintEvent(self, e):
-        if self.paint:
-            qp = QPainter()
-            qp.begin(self)
-            self.draw(qp)
-            qp.end()
-            self.paint = -self.paint
-    def draw(self, qp):
-        self.paint = True
-        qp.setBrush(QColor(255, 255, 0))
-        point = QPoint(randrange(0, self.width()), randrange(0, self.height()))
-        r = randrange(10, self.height() // 2)
-        qp.drawEllipse(point, r,  r)
+
 
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = MyWidget()
-    ex.show()
-    sys.exit(app.exec())
+    app.run(port=8080, host='127.0.0.1')
